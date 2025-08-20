@@ -15,7 +15,11 @@ const App = () => {
     personService.getAll().then(data => {
       setPersons(data)
     })
-  }, [])
+  }, []);
+
+    const filteredPersons = persons.filter(person =>
+    (person.name||"").toLowerCase().includes(filter.toLowerCase())
+  )
 
   const handleAdd = (e) => {
     e.preventDefault()
@@ -54,8 +58,8 @@ const App = () => {
 
       personService
         .create(newPerson)
-        .then(data => {
-          setPersons([...persons, data])
+        .then(returnedPerson => {
+          setPersons(returnedPerson)
           setNewName('')
           setNewPhone('')
         })
@@ -76,9 +80,7 @@ const App = () => {
     }
   }
 
-  const filteredPersons = persons.filter(person =>
-    person.name.toLowerCase().includes(filter.toLowerCase())
-  )
+
 
   return (
     <div>
