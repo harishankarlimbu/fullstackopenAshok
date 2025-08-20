@@ -4,12 +4,22 @@ import Filter from './Filter'
 import Person from './Person'
 import Detail from './Detail'
 import personService from './services/person'
+import Notification from './Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [filter, setFilter] = useState('')
+
+  const [notification, setNotification] = useState(null)
+
+const showNotification = (text, type = "success") => {
+  setNotification({ text, type })
+  setTimeout(() => {
+    setNotification(null)
+  }, 3000) 
+}
 
   useEffect(() => {
     personService.getAll().then(data => {
@@ -50,7 +60,13 @@ const App = () => {
             setPersons(persons.map(p => p.id === existingPerson.id ? data : p))
             setNewName('')
             setNewPhone('')
+            showNotification(`Updated ${newName}'s number`, "success")
+
           })
+        .catch(error => {
+    showNotification(`Information of ${newName} has already been removed from server`, "error")
+    setPersons(persons.filter(p => p.id !== existingPerson.id))
+  })
       }
     } 
     else {
@@ -62,9 +78,11 @@ const App = () => {
           setPersons(returnedPerson)
           setNewName('')
           setNewPhone('')
+          showNotification(`Added ${newName}`, "success")
         })
         .catch(error => {
-          console.log('Error posting new person:', error)
+              showNotification("Failed to add person", "error")
+
         })
     }
   }
@@ -85,6 +103,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
 
       <Filter
         filter={filter}
