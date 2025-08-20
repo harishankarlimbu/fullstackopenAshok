@@ -5,6 +5,7 @@ import Person from './Person'
 import Detail from './Detail'
 import personService from './services/person'
 import Notification from './Notification'
+import "./index.css"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -14,12 +15,12 @@ const App = () => {
 
   const [notification, setNotification] = useState(null)
 
-const showNotification = (text, type = "success") => {
-  setNotification({ text, type })
-  setTimeout(() => {
-    setNotification(null)
-  }, 3000) 
-}
+  const showNotification = (text, type = "success") => {
+    setNotification({ text, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 3000)
+  }
 
   useEffect(() => {
     personService.getAll().then(data => {
@@ -27,8 +28,8 @@ const showNotification = (text, type = "success") => {
     })
   }, []);
 
-    const filteredPersons = persons.filter(person =>
-    (person.name||"").toLowerCase().includes(filter.toLowerCase())
+  const filteredPersons = persons.filter(person =>
+    (person.name || "").toLowerCase().includes(filter.toLowerCase())
   )
 
   const handleAdd = (e) => {
@@ -63,12 +64,12 @@ const showNotification = (text, type = "success") => {
             showNotification(`Updated ${newName}'s number`, "success")
 
           })
-        .catch(error => {
-    showNotification(`Information of ${newName} has already been removed from server`, "error")
-    setPersons(persons.filter(p => p.id !== existingPerson.id))
-  })
+          .catch(error => {
+            showNotification(`Information of ${newName} has already been removed from server`, "error")
+            setPersons(persons.filter(p => p.id !== existingPerson.id))
+          })
       }
-    } 
+    }
     else {
       const newPerson = { name: newName, number: newPhone }
 
@@ -81,7 +82,7 @@ const showNotification = (text, type = "success") => {
           showNotification(`Added ${newName}`, "success")
         })
         .catch(error => {
-              showNotification("Failed to add person", "error")
+          showNotification("Failed to add person", "error")
 
         })
     }
