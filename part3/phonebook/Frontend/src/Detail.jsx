@@ -5,7 +5,7 @@ const Detail = ({ newName, newPhone, onNameChange, onPhoneChange, onSubmit }) =>
         name: <input type ='text' value={newName} onChange={onNameChange} />
       </div>
       <div>
-        phone: <input type='number' value={newPhone} onChange={onPhoneChange} />
+        phone: <input value={newPhone} onChange={onPhoneChange} />
       </div>
       <div>
         <button type="submit">add</button>
