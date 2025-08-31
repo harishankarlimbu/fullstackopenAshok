@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
+const loginRouter = require('./controllers/login')
 // Config
 const { mongoUrl } = require('./utils/config')
 
@@ -25,7 +26,8 @@ app.use(middleware.requestLogger)
 
 // Routes
 app.use('/api/users', usersRouter)
-app.use('/api/blogs', blogsRouter)
+app.use('/api/blogs', middleware.tokenExtractor,blogsRouter)
+app.use('/api/login', loginRouter)
 
 // Unknown endpoint
 app.use(middleware.unknownEndpoint)
