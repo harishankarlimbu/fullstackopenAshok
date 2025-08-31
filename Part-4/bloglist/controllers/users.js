@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt')
 
 usersRouter.get('/', async (req, res, next) => {
   try {
-    const users = await User.find({})
+    const users = await User.find({}).populate('blogs', { title: 1, url: 1, likes: 1 })
     res.json(users)
   } catch (err) {
     next(err)
@@ -17,6 +17,10 @@ usersRouter.post('/', async (req, res, next) => {
 
     if (!username || !password) {
       return res.status(400).json({ error: 'username or password missing' })
+    }
+
+    if (password.length < 3) {
+      return res.status(400).json({ error: 'password must be at least 3 characters long' })
     }
 
     const saltRounds = 10

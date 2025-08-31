@@ -1,30 +1,42 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user') 
 
-// Get all blogs
+// 🔹 Get all blogs 
 blogsRouter.get('/', async (req, res) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog
+    .find({})
+    .populate('user', { username: 1, name: 1 }) 
   res.json(blogs)
 })
 
-// Add a new blog
+// Create a new blog
 blogsRouter.post('/', async (req, res, next) => {
-  const body = req.body
-
-  if (!body.title || !body.url) {
-    return res.status(400).json({ error: 'title or url missing' })
-  }
-
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0,
-    // user will be added in 4.17/4.19 when token auth is implemented
-  })
-
   try {
+    const { title, author, url, likes, userId } = req.body
+
+    if (!title || !url) {
+      return res.status(400).json({ error: 'title and url are required' })
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(400).json({ error: 'invalid userId' })
+    }
+
+    const blog = new Blog({
+      title,
+      author,
+      url,
+      likes: likes || 0, 
+      user: user.id
+    })
+
     const savedBlog = await blog.save()
+
+    user.blogs = user.blogs.concat(savedBlog.id)
+    await user.save()
+
     res.status(201).json(savedBlog)
   } catch (err) {
     next(err)
@@ -32,18 +44,37 @@ blogsRouter.post('/', async (req, res, next) => {
 })
 
 // Delete all blogs
-blogsRouter.delete('/', async (req, res) => {
-  await Blog.deleteMany({})
-  res.status(204).end()
+blogsRouter.delete('/', async (req, res, next) => {
+  try {
+    await Blog.deleteMany({})
+    res.status(204).end()
+  } catch (err) {
+    next(err)
+  }
 })
 
-// Update a blog
+// Update a blog by ID
 blogsRouter.put('/:id', async (req, res, next) => {
-  const id = req.params.id
-  const body = req.body
+  const { title, author, url, likes } = req.body
+
+  const updatedData = {
+    title,
+    author,
+    url,
+    likes
+  }
 
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(id, body, { new: true })
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      updatedData,
+      { new: true, runValidators: true, context: 'query' } 
+    )
+
+    if (!updatedBlog) {
+      return res.status(404).json({ error: 'blog not found' })
+    }
+
     res.json(updatedBlog)
   } catch (err) {
     next(err)
