@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user') 
+const { userExtractor } = require('../utils/middleware')
 
 // 🔹 Get all blogs 
 blogsRouter.get('/', async (req, res) => {
@@ -44,14 +45,33 @@ blogsRouter.post('/', async (req, res, next) => {
 })
 
 // Delete all blogs
-blogsRouter.delete('/', async (req, res, next) => {
+const { userExtractor } = require('../utils/middleware')
+
+// Delete a blog by ID
+blogsRouter.delete('/:id', userExtractor, async (req, res, next) => {
   try {
-    await Blog.deleteMany({})
+    const user = req.user
+    const blog = await Blog.findById(req.params.id)
+
+    if (!blog) {
+      return res.status(404).json({ error: 'blog not found' })
+    }
+
+    if (blog.user.toString() !== user.id.toString()) {
+      return res.status(401).json({ error: 'unauthorized: cannot delete this blog' })
+    }
+
+    await Blog.findByIdAndRemove(req.params.id)
+
+    user.blogs = user.blogs.filter(b => b.toString() !== req.params.id)
+    await user.save()
+
     res.status(204).end()
   } catch (err) {
     next(err)
   }
 })
+
 
 // Update a blog by ID
 blogsRouter.put('/:id', async (req, res, next) => {
