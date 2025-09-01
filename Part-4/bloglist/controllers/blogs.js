@@ -1,9 +1,8 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user') 
 const { userExtractor } = require('../utils/middleware')
 
-// 🔹 Get all blogs 
+// Get all blogs
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog
     .find({})
@@ -12,17 +11,13 @@ blogsRouter.get('/', async (req, res) => {
 })
 
 // Create a new blog
-blogsRouter.post('/', async (req, res, next) => {
+blogsRouter.post('/', userExtractor, async (req, res, next) => {
   try {
-    const { title, author, url, likes, userId } = req.body
+    const { title, author, url, likes } = req.body
+    const user = req.user  
 
     if (!title || !url) {
       return res.status(400).json({ error: 'title and url are required' })
-    }
-
-    const user = await User.findById(userId)
-    if (!user) {
-      return res.status(400).json({ error: 'invalid userId' })
     }
 
     const blog = new Blog({
@@ -30,12 +25,12 @@ blogsRouter.post('/', async (req, res, next) => {
       author,
       url,
       likes: likes || 0, 
-      user: user.id
+      user: user._id
     })
 
     const savedBlog = await blog.save()
 
-    user.blogs = user.blogs.concat(savedBlog.id)
+    user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
 
     res.status(201).json(savedBlog)
@@ -43,9 +38,6 @@ blogsRouter.post('/', async (req, res, next) => {
     next(err)
   }
 })
-
-// Delete all blogs
-const { userExtractor } = require('../utils/middleware')
 
 // Delete a blog by ID
 blogsRouter.delete('/:id', userExtractor, async (req, res, next) => {
@@ -57,11 +49,11 @@ blogsRouter.delete('/:id', userExtractor, async (req, res, next) => {
       return res.status(404).json({ error: 'blog not found' })
     }
 
-    if (blog.user.toString() !== user.id.toString()) {
+    if (blog.user.toString() !== user._id.toString()) {
       return res.status(401).json({ error: 'unauthorized: cannot delete this blog' })
     }
 
-    await Blog.findByIdAndRemove(req.params.id)
+    await Blog.findByIdAndDelete(req.params.id)
 
     user.blogs = user.blogs.filter(b => b.toString() !== req.params.id)
     await user.save()
@@ -72,17 +64,11 @@ blogsRouter.delete('/:id', userExtractor, async (req, res, next) => {
   }
 })
 
-
 // Update a blog by ID
 blogsRouter.put('/:id', async (req, res, next) => {
   const { title, author, url, likes } = req.body
 
-  const updatedData = {
-    title,
-    author,
-    url,
-    likes
-  }
+  const updatedData = { title, author, url, likes }
 
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(
