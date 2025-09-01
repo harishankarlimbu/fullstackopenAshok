@@ -11,7 +11,6 @@ const blogsRouter = require('./controllers/blogs')
 
 // Middleware
 const middleware = require('./utils/middleware')
-
 const app = express()
 
 // Connect to MongoDB
