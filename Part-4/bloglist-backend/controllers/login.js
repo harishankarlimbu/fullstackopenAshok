@@ -4,7 +4,6 @@ import express from "express"
 import User from "../models/user.js"
 
 const loginRouter = express.Router()
-
 loginRouter.post("/", async (req, res, next) => {
   console.log("Login request body:", req.body)
   try {
