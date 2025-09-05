@@ -1,13 +1,15 @@
-const usersRouter = require('express').Router()
-const User = require('../models/user')
-const bcrypt = require('bcrypt')
+import express from 'express'
+import User from '../models/user.js'
+import bcrypt from 'bcrypt'
+
+const usersRouter = express.Router()
 
 usersRouter.get('/', async (req, res, next) => {
   try {
     const users = await User.find({}).populate('blogs', { title: 1, url: 1, likes: 1 })
     res.json(users)
-  } catch (err) {
-    next(err)
+  } catch (error) {
+    next(error)
   }
 })
 
@@ -29,15 +31,17 @@ usersRouter.post('/', async (req, res, next) => {
     const newUser = new User({
       username,
       name,
-      passwordHash    
+      passwordHash,
     })
 
     const savedUser = await newUser.save()
     res.status(201).json(savedUser)
-
-  } catch (err) {
-    next(err)
+  } catch (error) {
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+      return res.status(400).json({ error: 'username must be unique' })
+    }
+    next(error)
   }
 })
 
-module.exports = usersRouter
+export default usersRouter
