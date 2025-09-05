@@ -1,9 +1,34 @@
 import React from 'react'
+import { useState } from 'react'
 
-const Blog = ({ blog }) => (
-  <div className="blog">
-    <strong>{blog.title}</strong> by {blog.author}
+const Blog = ({ blog }) => {
+  const [visible,setVisible]=useState(false)
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
+  }
+
+  return (
+  <div style={blogStyle}>
+    <div>
+      {blog.title}
+    </div>
+    
+<button onClick={() => setVisible(!visible)}>
+  {visible ? "Hide" : "View"}
+</button>
+{visible && (
+  <div>
+    <div>Author: {blog.author}</div>
+    <div>URL: {blog.url}</div>
+    <div>Likes: {blog.likes}</div>
+  </div>
+)}
   </div>
 )
+}
 
 export default Blog
