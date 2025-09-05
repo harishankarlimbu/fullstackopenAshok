@@ -29,11 +29,11 @@ blogsRouter.post("/", userExtractor, async (req, res, next) => {
       author,
       url,
       likes: likes || 0,
-      user: user._id,
+      user: user.id,
     })
 
     const savedBlog = await blog.save()
-    user.blogs = user.blogs.concat(savedBlog._id)
+    user.blogs = user.blogs.concat(savedBlog.id)
     await user.save()
 
     res.status(201).json(savedBlog)
