@@ -25,9 +25,9 @@ const Blog = ({ blog, onLike ,onDelete }) => {
         <div>
           <div>Author: {blog.author}</div>
           <div>URL: {blog.url}</div>
-          <div>Likes: {blog.likes}
-            <button onClick={() => { onLike(blog); setLiked(true) }}>like</button>
+          <div>Likes: {blog.likes} 
           </div>
+            <button onClick={() => { onLike(blog); setLiked(true) }}>like</button>
           {liked && <div>{blog.author}</div>}
           <button
             onClick={() => {

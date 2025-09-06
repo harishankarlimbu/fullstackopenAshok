@@ -25,7 +25,7 @@ const BlogForm = ({ onCreate }) => {
     setTitle('')
     setAuthor('')
     setUrl('')
-    setVisible()
+    setVisible(false)
   }
 
 
