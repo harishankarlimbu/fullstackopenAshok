@@ -29,8 +29,8 @@ function App() {
         try {
           const blogs = await blogService.getAll()
           setBlogs(blogs)
-        } catch (e) {
-          console.error('fetch blogs failed', e)
+        } catch (error) {
+          console.error('fetch blogs failed', error)
         }
       }
     }
@@ -78,6 +78,7 @@ function App() {
       setNotification({ message: `A new blog "${createdBlog.title}" by ${createdBlog.author} added`, type: 'success' })
       setTimeout(() => setNotification({ message: '', type: '' }), 3000)
     } catch (error) {
+      console.error(error)
       setNotification({ message: 'Failed to create blog', type: 'error' })
       setTimeout(() => setNotification({ message: '', type: '' }), 3000)
     }
@@ -108,8 +109,22 @@ function App() {
 
       setBlogs(prev => prev.map(b => (b.id === blog.id ? enriched : b)))
     } catch (error) {
-      console.error('Error liking blog:', error)
+      console.log(error)
+      setNotification({ message: 'Failed to create blog', type: 'error' })
+      setTimeout(() => setNotification({ message: '', type: '' }), 3000)
     }
+  }
+  const handleDelete = async (id) => {
+    try {
+      await blogService.remove(id)
+      setBlogs(blogs.filter((b) => b.id !== id))
+      setNotification({ message: 'Blog deleted successfully', type: 'success' })
+    } catch (error) {
+      console.log(error)
+      setNotification({ message: 'Failed to delete blog', type: 'error' })
+    }
+
+    setTimeout(() => setNotification({ message: '', type: '' }), 3000)
   }
 
   if (!user) {
@@ -132,16 +147,15 @@ function App() {
       </p>
       <BlogForm onCreate={handleCreate} />
       {blogs
-        .slice() 
+        .slice()
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <li><Blog key={blog.id} blog={blog} onLike={handleLike} />
+          <li key={blog.id}>
+            <Blog blog={blog} onDelete={handleDelete} onLike={handleLike} />
           </li>
         ))}
     </div>
-
   )
 }
 
 export default App
-// test  

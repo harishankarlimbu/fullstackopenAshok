@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 
-const Blog = ({ blog, onLike }) => {
+const Blog = ({ blog, onLike ,onDelete }) => {
   const [liked, setLiked] = useState(false)
   const [visible, setVisible] = useState(false)
   const blogStyle = {
@@ -19,7 +19,7 @@ const Blog = ({ blog, onLike }) => {
       </div>
 
       <button onClick={() => setVisible(!visible)}>
-        {visible ? "Hide" : "View"}
+        {visible ? 'Hide' : 'View'}
       </button>
       {visible && (
         <div>
@@ -29,6 +29,16 @@ const Blog = ({ blog, onLike }) => {
             <button onClick={() => { onLike(blog); setLiked(true) }}>like</button>
           </div>
           {liked && <div>{blog.author}</div>}
+          <button
+            onClick={() => {
+              if (window.confirm(`Remove blog "${blog.title}" by ${blog.author}?`))
+              {
+                onDelete(blog.id)
+              }
+            }}
+          >
+              remove
+          </button>
 
         </div>
       )}

@@ -6,15 +6,15 @@ const BlogForm = ({ onCreate }) => {
   const [url, setUrl] = useState('')
   const [visible, setVisible] = useState(false)
 
-   function visibility() {
+  function visibility() {
     setVisible(!visible)
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    
-    if(title==="" || author==="" || url===""){
-      alert("One is Empty Fied")
+
+    if(title==='' || author==='' || url===''){
+      alert('One is Empty Fied')
 
     }
 
@@ -28,7 +28,7 @@ const BlogForm = ({ onCreate }) => {
     setVisible()
   }
 
- 
+
 
   return (
     <div>
@@ -60,10 +60,10 @@ const BlogForm = ({ onCreate }) => {
                 onChange={(e) => setUrl(e.target.value)}
               />
             </div>
-             <button type="submit">Create</button>
+            <button type="submit">Create</button>
           </form>
           <button type="button" onClick={visibility}>Cancel</button>
-           <hr />
+          <hr />
 
         </div>)
         :
