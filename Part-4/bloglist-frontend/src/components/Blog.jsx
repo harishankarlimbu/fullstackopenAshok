@@ -1,8 +1,9 @@
 import React from 'react'
 import { useState } from 'react'
 
-const Blog = ({ blog }) => {
-  const [visible,setVisible]=useState(false)
+const Blog = ({ blog, onLike }) => {
+  const [liked, setLiked] = useState(false)
+  const [visible, setVisible] = useState(false)
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -12,23 +13,27 @@ const Blog = ({ blog }) => {
   }
 
   return (
-  <div style={blogStyle}>
-    <div>
-      {blog.title}
+    <div style={blogStyle}>
+      <div>
+        {blog.title}
+      </div>
+
+      <button onClick={() => setVisible(!visible)}>
+        {visible ? "Hide" : "View"}
+      </button>
+      {visible && (
+        <div>
+          <div>Author: {blog.author}</div>
+          <div>URL: {blog.url}</div>
+          <div>Likes: {blog.likes}
+            <button onClick={() => { onLike(blog); setLiked(true) }}>like</button>
+          </div>
+          {liked && <div>{blog.author}</div>}
+
+        </div>
+      )}
     </div>
-    
-<button onClick={() => setVisible(!visible)}>
-  {visible ? "Hide" : "View"}
-</button>
-{visible && (
-  <div>
-    <div>Author: {blog.author}</div>
-    <div>URL: {blog.url}</div>
-    <div>Likes: {blog.likes}</div>
-  </div>
-)}
-  </div>
-)
+  )
 }
 
 export default Blog

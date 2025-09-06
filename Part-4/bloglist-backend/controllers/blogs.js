@@ -67,4 +67,27 @@ blogsRouter.delete("/:id", userExtractor, async (req, res, next) => {
   }
 })
 
+//update the likes
+blogsRouter.put('/:id', async (req, res, next) => {
+  try {
+    const body = req.body
+
+    const blog = {
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes,
+      user: body.user
+    }
+
+    // findByIdAndUpdate with new:true to return updated doc
+    const updated = await Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
+      .populate('user', { username: 1, name: 1 })
+
+    res.json(updated)
+  } catch (error) {
+    next(error)
+  }
+})
+
 export default blogsRouter

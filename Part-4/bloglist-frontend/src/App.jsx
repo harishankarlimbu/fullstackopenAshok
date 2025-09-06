@@ -53,8 +53,6 @@ function App() {
       setTimeout(() => setNotification({ message: '', type: '' }), 3000)
     }
   }
-console.log("hi") 
-console.log("hi") 
 
   const handleLogout = () => {
     setUser(null)
@@ -66,12 +64,12 @@ console.log("hi")
   }
 
   const handleCreate = async (newBlog) => {
-     const { title, author, url } = newBlog
+    const { title, author, url } = newBlog
 
     if (!title || !author || !url) {
-    setNotification({ message: 'Please fill in all fields', type: 'error' })
-    setTimeout(() => setNotification({ message: '', type: '' }), 3000)
-    return
+      setNotification({ message: 'Please fill in all fields', type: 'error' })
+      setTimeout(() => setNotification({ message: '', type: '' }), 3000)
+      return
     }
 
     try {
@@ -82,6 +80,35 @@ console.log("hi")
     } catch (error) {
       setNotification({ message: 'Failed to create blog', type: 'error' })
       setTimeout(() => setNotification({ message: '', type: '' }), 3000)
+    }
+  }
+
+  const handleLike = async (blog) => {
+    try {
+      // Extract user id robustly:
+      const userId = blog.user
+        ? (typeof blog.user === 'object' ? (blog.user.id || blog.user._id) : blog.user)
+        : null
+
+      const updatedData = {
+        user: userId,
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: (blog.likes || 0) + 1
+      }
+
+      const returned = await blogService.update(blog.id, updatedData)
+
+      // If backend returns user as id (string), preserve the original user object so UI still shows name.
+      const enriched = {
+        ...returned,
+        user: (typeof returned.user === 'string') ? blog.user : returned.user
+      }
+
+      setBlogs(prev => prev.map(b => (b.id === blog.id ? enriched : b)))
+    } catch (error) {
+      console.error('Error liking blog:', error)
     }
   }
 
@@ -104,12 +131,15 @@ console.log("hi")
         <button onClick={handleLogout}>logout</button>
       </p>
       <BlogForm onCreate={handleCreate} />
-      {blogs.map((blog) => (
-        <li><Blog key={blog.id} blog={blog} />
-        </li>
-      ))}
+      {blogs
+        .slice() 
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <li><Blog key={blog.id} blog={blog} onLike={handleLike} />
+          </li>
+        ))}
     </div>
-  
+
   )
 }
 
