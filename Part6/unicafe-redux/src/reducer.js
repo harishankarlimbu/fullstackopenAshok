@@ -1,4 +1,3 @@
-// reducer.js
 const initialState = {
   good: 0,
   ok: 0,
