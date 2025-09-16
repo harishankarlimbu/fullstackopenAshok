@@ -11,7 +11,6 @@ function App() {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState({ message: '', type: '' })
 
-
   // Load logged-in user from localStorage
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -64,60 +63,52 @@ function App() {
   }
 
   const handleCreate = async (newBlog) => {
-    const { title, author, url } = newBlog
+  try {
+    const createdBlog = await blogService.create(newBlog);
 
-    if (!title || !author || !url) {
-      setNotification({ message: 'Please fill in all fields', type: 'error' })
-      setTimeout(() => setNotification({ message: '', type: '' }), 3000)
-      return
-    }
+    // enrich user to current user (so remove button shows immediately)
+    const enrichedBlog = {
+      ...createdBlog,
+      user: createdBlog.user && typeof createdBlog.user === 'string'
+        ? user
+        : createdBlog.user
+    };
 
-    try {
-      const createdBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(createdBlog))
-      setNotification({ message: `A new blog "${createdBlog.title}" by ${createdBlog.author} added`, type: 'success' })
-      setTimeout(() => setNotification({ message: '', type: '' }), 3000)
-    } catch (error) {
-      console.error(error)
-      setNotification({ message: 'Failed to create blog', type: 'error' })
-      setTimeout(() => setNotification({ message: '', type: '' }), 3000)
-    }
+    setBlogs(blogs.concat(enrichedBlog));
+    setNotification({ message: `A new blog "${createdBlog.title}" by ${createdBlog.author} added`, type: 'success' });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3000);
+  } catch (error) {
+    console.error(error)
+    setNotification({ message: 'Failed to create blog', type: 'error' });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3000);
   }
+};
 
-  const handleLike = async (blog) => {
+  const handleLike = async (blogId) => {
+    const blog = blogs.find(b => b.id === blogId || b._id === blogId)
+    if (!blog) return
+
     try {
-      // Extract user id robustly:
-      const userId = blog.user
-        ? (typeof blog.user === 'object' ? (blog.user.id || blog.user._id) : blog.user)
-        : null
+      const updatedData = { likes: (blog.likes || 0) + 1 }
+      const returned = await blogService.update(blogId, updatedData)
 
-      const updatedData = {
-        user: userId,
-        title: blog.title,
-        author: blog.author,
-        url: blog.url,
-        likes: (blog.likes || 0) + 1
-      }
-
-      const returned = await blogService.update(blog.id, updatedData)
-
-      // If backend returns user as id (string), preserve the original user object so UI still shows name.
       const enriched = {
         ...returned,
-        user: (typeof returned.user === 'string') ? blog.user : returned.user
+        user: typeof returned.user === 'string' ? blog.user : returned.user
       }
 
-      setBlogs(prev => prev.map(b => (b.id === blog.id ? enriched : b)))
+      setBlogs(prev =>
+        prev.map(b => (b.id === blogId || b._id === blogId ? enriched : b))
+      )
     } catch (error) {
-      console.log(error)
-      setNotification({ message: 'Failed to create blog', type: 'error' })
-      setTimeout(() => setNotification({ message: '', type: '' }), 3000)
+      console.error('Failed to like blog:', error)
     }
   }
+
   const handleDelete = async (id) => {
     try {
       await blogService.remove(id)
-      setBlogs(blogs.filter((b) => b.id !== id))
+      setBlogs(prev => prev.filter((b) => b.id !== id && b._id !== id))
       setNotification({ message: 'Blog deleted successfully', type: 'success' })
     } catch (error) {
       console.log(error)
@@ -150,9 +141,13 @@ function App() {
         .slice()
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <li key={blog.id}>
-            <Blog blog={blog} onDelete={handleDelete} onLike={handleLike} />
-          </li>
+          <Blog
+            key={blog.id || blog._id}
+            blog={blog}
+            onDelete={handleDelete}
+            onLike={handleLike}
+            currentUser={user}
+          />
         ))}
     </div>
   )
