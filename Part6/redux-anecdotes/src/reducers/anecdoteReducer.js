@@ -1,3 +1,21 @@
+const getId = () => (100000 * Math.random()).toFixed(0)
+
+export const asObject = (anecdote) => ({
+  content: anecdote,
+  id: getId(),
+  votes: 0,
+})
+
+export const voteAnecdote = (id) => ({
+  type: 'VOTE',
+  data: { id }
+})
+
+export const createAnecdote = (content) => ({
+  type: 'NEW_ANECDOTE',
+  data: asObject(content)
+})
+
 const anecdotesAtStart = [
   "If it hurts, do it more often",
   "Adding manpower to a late software project makes it later!",
@@ -5,38 +23,19 @@ const anecdotesAtStart = [
   "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
   "Premature optimization is the root of all evil.",
   "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
-];
+]
 
-const getId = () => (100000 * Math.random()).toFixed(0);
+const initialState = anecdotesAtStart.map(asObject)
 
-export const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0,
-  };
-};
-
-const initialState = anecdotesAtStart.map(asObject);
-
-const reducer = (state = initialState, action) => {
-  console.log("state now: ", state);
+const anecdoteReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "VOTE": {
-      const id = action.data.id;
-      return state.map((ancedote) =>
-        ancedote.id !== id
-          ? ancedote
-          : { ...ancedote, votes: ancedote.votes + 1 }
-      );
-    }
-    case "NEW_ANECDOTE":{
+    case 'VOTE':
+      return state.map(a => a.id !== action.data.id ? a : { ...a, votes: a.votes + 1 })
+    case 'NEW_ANECDOTE':
       return state.concat(action.data)
-    }
+    default:
+      return state
   }
-  console.log("action", action);
+}
 
-  return state;
-};
-
-export default reducer;
+export default anecdoteReducer
