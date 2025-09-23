@@ -1,12 +1,14 @@
-import { configure } from "@testing-library/react";
+import { configureStore } from '@reduxjs/toolkit'
 import anecdoteReducer from './reducers/anecdoteReducer.js'
 import filterReducer from './reducers/filterReducer.js'
-import { createStore, combineReducers } from 'redux'
+import notificationReducer from './reducers/notificationReducer.js'
 
-const reducer = combineReducers({
-  anecdotes: anecdoteReducer,
-  filter: filterReducer
+const store = configureStore({
+  reducer: {
+    anecdotes: anecdoteReducer,
+    filter: filterReducer,
+    notification: notificationReducer
+  }
 })
 
-const store = createStore(reducer)
 export default store
