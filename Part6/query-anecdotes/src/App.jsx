@@ -1,39 +1,54 @@
 import AnecdoteForm from './components/AnecdoteForm'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery , useMutation, useQueryClient } from '@tanstack/react-query'
+import { getAll, updateAnecdote } from './services/backendRouter'
 import Notification from './components/Notification'
-import { getAll } from './services/backendRouter'
 
-const App = () => {
-  // Fetch anecdotes with React Query
+function App(){
+  const queryClient = useQueryClient()
+
+  // Fetch anecdotes
   const { data: anecdotes, isLoading, isError, error } = useQuery({
     queryKey: ['anecdotes'],
     queryFn: getAll,
     retry: 1,
   })
 
-  // Show loading state
+  // mutation for updating votes
+  const updateAnecdoteMutation = useMutation({
+  mutationFn: (anecdote) => updateAnecdote(anecdote.id, anecdote),
+  onSuccess: (updatedAnecdote) => {
+    queryClient.setQueryData(['anecdotes'], (old) =>
+      old.map((a) => a.id === updatedAnecdote.id ? updatedAnecdote : a)
+    )
+  }
+})
+
   if (isLoading) {
     return <div>Loading anecdotes...</div>
   }
 
-  // Show error state
   if (isError) {
     return <div>Error: {error.message}</div>
   }
 
   const handleVote = (anecdote) => {
-    console.log('vote', anecdote)
+    const updatedAnecdote = { ...anecdote, votes: anecdote.votes + 1 }
+    updateAnecdoteMutation.mutate(updatedAnecdote)
   }
 
   return (
     <div>
       <h3>Anecdote app</h3>
       <Notification />
-      <AnecdoteForm />
-
+      <AnecdoteForm/>
       {anecdotes.map((anecdote) => (
         <div key={anecdote.id}>
-          <div>{anecdote.content}</div>
+          <div>
+            {typeof anecdote.content === 'string' 
+              ? anecdote.content 
+              : anecdote.content.content || JSON.stringify(anecdote.content)
+            }
+          </div>
           <div>
             has {anecdote.votes}{' '}
             <button onClick={() => handleVote(anecdote)}>vote</button>
