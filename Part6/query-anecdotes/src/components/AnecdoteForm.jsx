@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createNew } from '../services/backendRouter'
+import { useNotification } from './NotificationContext'
 
 const AnecdoteForm = () => {
   const queryClient = useQueryClient()
+  const { dispatch } = useNotification()
 
 // Mutation for creating a new anecdote
   const newAnecdoteMutation = useMutation({
@@ -10,6 +12,19 @@ const AnecdoteForm = () => {
     onSuccess: (newAnecdote) => {
       const anecdotes = queryClient.getQueryData(['anecdotes']) || []
       queryClient.setQueryData(['anecdotes'], anecdotes.concat(newAnecdote))
+      // Dispatch success notification
+      dispatch({ type: 'SET', payload: `New Anecdote'${newAnecdote.content}' created!` })
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR' })
+      }, 5000)  
+    },
+    onError: (error) => {
+      // Dispatch error notification
+      dispatch({ type: 'SET', payload: `Error: ${error.message}` })
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR' })
+      }
+      , 5000)
     }
   })
 

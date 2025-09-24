@@ -1,15 +1,13 @@
+import { useNotification } from './NotificationContext.jsx'
+
 const Notification = () => {
-  const style = {
-    border: 'solid',
-    padding: 8,
-    borderWidth: 1,
-    marginBottom: 5
-  }
-  
-  if (true) return null
+  const { state } = useNotification()
+
+  if (!state) return null
 
   return (
-    <div style={style}>
+    <div style={{ border: '1px solid black', background :"lightgrey", padding: 8, marginBottom:8 }}>
+      {state}
     </div>
   )
 }
