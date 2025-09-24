@@ -12,7 +12,7 @@ const AnecdoteForm = () => {
     if (!content || content.trim() === '') return
     event.target.anecdote.value = ''
     dispatch(createNewAnecdote(content))
-    dispatch(showNotification(`You added: "${content}"`))
+    dispatch(showNotification(`You added: "${content}"`,5))
   }
 
   return (
