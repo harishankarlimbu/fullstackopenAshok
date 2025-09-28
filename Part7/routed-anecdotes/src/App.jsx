@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import Menu from './Menu'
+import Anecdote from './Anecdotes'
 import AnecdoteList from './AnecdoteList'
 import About from './About'
 import Footer from './Footer'
 import CreateNew from './CreateNew'
+import { Routes , Route} from 'react-router-dom'
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
     {
@@ -21,15 +23,10 @@ const App = () => {
       id: 2
     }
   ])
-  const [notification, setNotification] = useState('')
-
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
-    setNotification(`a new anecdote ${anecdote.content} created!`)
-    setTimeout(() => {
-      setNotification('')
-    }, 5000);
+   
   }
 
   const anecdoteById = (id) =>
@@ -46,15 +43,18 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
-  return (
-    <div>
-      <h1>Software anecdotes</h1>
-      <Menu />
-      <AnecdoteList anecdotes={anecdotes} />
-      <About />
-      <CreateNew addNew={addNew} />
-      <Footer />
-    </div>
+ return (
+      <div>
+        <h1>Software anecdotes</h1>
+        <Menu />
+        <Routes>
+          <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
+          <Route path="/create" element={<CreateNew addNew={addNew} />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/anecdotes/:id" element={<Anecdote anecdotes={anecdotes} />} />
+        </Routes>
+        <Footer />
+      </div>
   )
 }
 

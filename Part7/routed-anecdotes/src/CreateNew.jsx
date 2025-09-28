@@ -1,41 +1,67 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Notification from './Notification'
+
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+    const navigate = useNavigate()
+    const [content, setContent] = useState('')
+    const [author, setAuthor] = useState('')
+    const [info, setInfo] = useState('')
+    const [notification, setNotification] = useState('')
 
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        if (!content || content.length < 5) {
+            setNotification('Anecdote must be at least 5 characters long!')
+            setTimeout(() => setNotification(''), 5000)
+            return
+        }
+        props.addNew({
+            content,
+            author,
+            info,
+            votes: 0
+        })
+        setNotification(`A new anecdote "${content}" created!`)
+        setTimeout(() => {
+            setNotification('')
+            navigate('/')
+        }, 3000)
+    }
 
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    props.addNew({
-      content,
-      author,
-      info,
-      votes: 0
-    })
-  }
-
-  return (
-    <div>
-      <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+    return (
         <div>
-          content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+            <Notification message={notification} />
+            <h2>create a new anecdote</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    content
+                    <input
+                        name='content'
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                    />
+                </div>
+                <div>
+                    author
+                    <input
+                        name='author'
+                        value={author}
+                        onChange={(e) => setAuthor(e.target.value)}
+                    />
+                </div>
+                <div>
+                    url for more info
+                    <input
+                        name='info'
+                        value={info}
+                        onChange={(e) => setInfo(e.target.value)}
+                    />
+                </div>
+                <button>create</button>
+            </form>
         </div>
-        <div>
-          author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
-        </div>
-        <div>
-          url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
-        </div>
-        <button>create</button>
-      </form>
-    </div>
-  )
-
+    )
 }
+
 export default CreateNew
