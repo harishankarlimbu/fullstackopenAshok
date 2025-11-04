@@ -10,6 +10,11 @@ const CreateNew = (props) => {
     const info = useField('text')
     const [notification, setNotification] = useState('')
 
+    // Extract reset from each field to avoid passing it to input elements
+    const { reset: resetContent, ...contentProps } = content
+    const { reset: resetAuthor, ...authorProps } = author
+    const { reset: resetInfo, ...infoProps } = info
+
     const handleSubmit = (e) => {
         e.preventDefault()
         if (!content.value || content.value.length < 5) {
@@ -37,21 +42,21 @@ const CreateNew = (props) => {
             <form onSubmit={handleSubmit}>
                 <div>
                     content
-                    <input {...content} />
+                    <input {...contentProps} />
                 </div>
                 <div>
                     author
-                    <input {...author} />
+                    <input {...authorProps} />
                 </div>
                 <div>
                     url for more info
-                    <input {...info} />
+                    <input {...infoProps} />
                 </div>
                 <button>create</button>
                 <button type="button" onClick={() => {
-                    content.reset()
-                    author.reset()
-                    info.reset()
+                    resetContent()
+                    resetAuthor()
+                    resetInfo()
                 }}>reset</button>
             </form>
         </div>
