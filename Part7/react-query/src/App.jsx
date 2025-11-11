@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react'
+import { Routes, Route, Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import BlogList from './components/BlogList'
+import Users from './components/Users'
 import Notification from './Notifications'
 import { useNotification } from './contexts/NotificationContext'
 import { useUser } from './contexts/UserContext'
@@ -101,24 +104,29 @@ function App() {
   return (
     <div>
       <Notification message={notification.message} type={notification.type} />
-      <h2>blogs</h2>
-      <p>
-        {user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </p>
-      <BlogForm onCreate={handleCreate} />
-      {blogs
-        .slice()
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id || blog._id}
-            blog={blog}
-            onDelete={handleDelete}
-            onLike={handleLike}
-            currentUser={user}
-          />
-        ))}
+      <div>
+        <Link to="/" style={{ padding: 5 }}>blogs</Link>
+        <Link to="/users" style={{ padding: 5 }}>users</Link>
+        <span style={{ padding: 5 }}>
+          {user.name} logged in
+          <button onClick={handleLogout}>logout</button>
+        </span>
+      </div>
+      <Routes>
+        <Route path="/users" element={<Users />} />
+        <Route path="/" element={
+          <div>
+            <h2>blogs</h2>
+            <BlogForm onCreate={handleCreate} />
+            <BlogList
+              blogs={blogs}
+              onDelete={handleDelete}
+              onLike={handleLike}
+              currentUser={user}
+            />
+          </div>
+        } />
+      </Routes>
     </div>
   )
 }
