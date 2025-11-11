@@ -6,6 +6,7 @@ import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import Users from './components/Users'
+import User from './components/User'
 import Notification from './Notifications'
 import { showNotification } from './reducers/notificationReducer'
 import { initializeBlogs, createBlog, setBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
@@ -96,6 +97,7 @@ function App() {
         </span>
       </div>
       <Routes>
+        <Route path="/users/:id" element={<User />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={
           <div>

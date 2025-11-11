@@ -2,10 +2,10 @@ import React, { useEffect } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import LoginForm from './components/LoginForm'
-import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import Users from './components/Users'
+import User from './components/User'
 import Notification from './Notifications'
 import { useNotification } from './contexts/NotificationContext'
 import { useUser } from './contexts/UserContext'
@@ -113,6 +113,7 @@ function App() {
         </span>
       </div>
       <Routes>
+        <Route path="/users/:id" element={<User />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={
           <div>
