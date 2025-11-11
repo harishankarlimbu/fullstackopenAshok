@@ -18,16 +18,8 @@ const BlogView = ({ onLike, onDelete, onAddComment }) => {
 
   const isCreator = blog.user && currentUser && blog.user.username === currentUser.username
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
   return (
-    <div style={blogStyle}>
+    <div className="blog-view">
       <h2>{blog.title} by {blog.author}</h2>
       <div>
         <a href={blog.url} target="_blank" rel="noopener noreferrer">
@@ -65,7 +57,7 @@ const BlogView = ({ onLike, onDelete, onAddComment }) => {
           remove
         </button>
       )}
-      <div style={{ marginTop: 20 }}>
+      <div className="comments-section">
         <h3>comments</h3>
         <form onSubmit={(e) => {
           e.preventDefault()

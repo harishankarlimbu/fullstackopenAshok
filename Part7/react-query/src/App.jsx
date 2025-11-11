@@ -105,7 +105,7 @@ function App() {
 
   if (!user) {
     return (
-      <div>
+      <div className="login-container">
         <Notification message={notification.message} type={notification.type} />
         <h2>Log in to application</h2>
         <LoginForm onLogin={handleLogin} />

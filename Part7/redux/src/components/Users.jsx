@@ -12,32 +12,34 @@ const Users = () => {
   }, [dispatch])
 
   if (!users || users.length === 0) {
-    return <div>Loading users...</div>
+    return <div className="loading">Loading users...</div>
   }
 
   return (
     <div>
       <h2>Users</h2>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>blogs created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id || user._id}>
-              <td>
-                <Link to={`/users/${user.id || user._id}`}>
-                  {user.name || user.username}
-                </Link>
-              </td>
-              <td>{user.blogs ? user.blogs.length : 0}</td>
+      <div className="users-table">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>blogs created</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map(user => (
+              <tr key={user.id || user._id}>
+                <td>
+                  <Link to={`/users/${user.id || user._id}`}>
+                    {user.name || user.username}
+                  </Link>
+                </td>
+                <td>{user.blogs ? user.blogs.length : 0}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

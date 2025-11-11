@@ -61,10 +61,8 @@ const BlogForm = ({ onCreate }) => {
               />
             </div>
             <button type="submit">Create</button>
+            <button type="button" onClick={visibility}>Cancel</button>
           </form>
-          <button type="button" onClick={visibility}>Cancel</button>
-          <hr />
-
         </div>)
         :
         (

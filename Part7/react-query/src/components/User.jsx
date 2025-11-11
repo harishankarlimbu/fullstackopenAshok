@@ -7,17 +7,17 @@ const User = () => {
   const { data: users = [], isLoading } = useUsers()
 
   if (isLoading) {
-    return <div>Loading user...</div>
+    return <div className="loading">Loading user...</div>
   }
 
   const user = users.find(u => (u.id || u._id) === id)
 
   if (!user) {
-    return <div>User not found</div>
+    return <div className="loading">User not found</div>
   }
 
   return (
-    <div>
+    <div className="user-view">
       <h2>{user.name || user.username}</h2>
       <h3>Added blogs</h3>
       {user.blogs && user.blogs.length > 0 ? (
