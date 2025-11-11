@@ -7,9 +7,10 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './Notifications'
 import { showNotification } from './reducers/notificationReducer'
+import { initializeBlogs, createBlog, setBlogs, updateBlog, removeBlog } from './reducers/blogReducer'
 
 function App() {
-  const [blogs, setBlogs] = useState([])
+  const blogs = useSelector(state => state.blogs)
   const [user, setUser] = useState(null)
   const notification = useSelector(state => state.notification)
   const dispatch = useDispatch()
@@ -26,18 +27,10 @@ function App() {
 
   // Fetch blogs whenever user state changes
   useEffect(() => {
-    const fetch = async () => {
-      if (user) {
-        try {
-          const blogs = await blogService.getAll()
-          setBlogs(blogs)
-        } catch (error) {
-          console.error('fetch blogs failed', error)
-        }
-      }
+    if (user) {
+      dispatch(initializeBlogs())
     }
-    fetch()
-  }, [user])
+  }, [user, dispatch])
 
   const handleLogin = async (credentials) => {
     try {
@@ -46,8 +39,7 @@ function App() {
       blogService.setToken(loggedUser.token)
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(loggedUser))
       dispatch(showNotification(`${loggedUser.username} logged in successfully`, 'success'))
-      const blogs = await blogService.getAll()
-      setBlogs(blogs)
+      dispatch(initializeBlogs())
     } catch (error) {
       const message = error.response?.data?.error || 'Login failed'
       dispatch(showNotification(message, 'error'))
@@ -57,24 +49,14 @@ function App() {
   const handleLogout = () => {
     setUser(null)
     blogService.setToken(null)
-    setBlogs([])
+    dispatch(setBlogs([]))
     window.localStorage.removeItem('loggedBlogAppUser')
     dispatch(showNotification('Logged out successfully', 'success'))
   }
 
   const handleCreate = async (newBlog) => {
     try {
-      const createdBlog = await blogService.create(newBlog)
-
-      // enrich user to current user (so remove button shows immediately)
-      const enrichedBlog = {
-        ...createdBlog,
-        user: createdBlog.user && typeof createdBlog.user === 'string'
-          ? user
-          : createdBlog.user
-      }
-
-      setBlogs(blogs.concat(enrichedBlog))
+      const createdBlog = await dispatch(createBlog(newBlog, user))
       dispatch(showNotification(`A new blog "${createdBlog.title}" by ${createdBlog.author} added`, 'success'))
     } catch (error) {
       console.error(error)
@@ -95,9 +77,7 @@ function App() {
         user: typeof returned.user === 'string' ? blog.user : returned.user
       }
 
-      setBlogs(prev =>
-        prev.map(b => (b.id === blogId || b._id === blogId ? enriched : b))
-      )
+      dispatch(updateBlog(enriched))
     } catch (error) {
       console.error('Failed to like blog:', error)
     }
@@ -106,7 +86,7 @@ function App() {
   const handleDelete = async (id) => {
     try {
       await blogService.remove(id)
-      setBlogs(prev => prev.filter((b) => b.id !== id && b._id !== id))
+      dispatch(removeBlog(id))
       dispatch(showNotification('Blog deleted successfully', 'success'))
     } catch (error) {
       console.log(error)

@@ -1,0 +1,61 @@
+import { createSlice } from '@reduxjs/toolkit'
+import blogService from '../services/blogs'
+
+const blogSlice = createSlice({
+  name: 'blogs',
+  initialState: [],
+  reducers: {
+    setBlogs(state, action) {
+      return action.payload
+    },
+    appendBlog(state, action) {
+      state.push(action.payload)
+    },
+    updateBlog(state, action) {
+      const updated = action.payload
+      return state.map(blog => {
+        const blogId = blog.id || blog._id
+        const updatedId = updated.id || updated._id
+        return blogId === updatedId ? updated : blog
+      })
+    },
+    removeBlog(state, action) {
+      const idToRemove = action.payload
+      return state.filter(blog => {
+        const blogId = blog.id || blog._id
+        return blogId !== idToRemove
+      })
+    }
+  }
+})
+
+export const { setBlogs, appendBlog, updateBlog, removeBlog } = blogSlice.actions
+
+// Thunk: initialize blogs from backend
+export const initializeBlogs = () => {
+  return async dispatch => {
+    const blogs = await blogService.getAll()
+    dispatch(setBlogs(blogs))
+  }
+}
+
+// Thunk: create a new blog
+export const createBlog = (newBlog, user) => {
+  return async dispatch => {
+    const createdBlog = await blogService.create(newBlog)
+    
+    // enrich user to current user (so remove button shows immediately)
+    const enrichedBlog = {
+      ...createdBlog,
+      user: createdBlog.user && typeof createdBlog.user === 'string'
+        ? user
+        : createdBlog.user
+    }
+    
+    dispatch(appendBlog(enrichedBlog))
+    return enrichedBlog
+  }
+}
+
+export default blogSlice.reducer
+
