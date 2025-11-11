@@ -90,4 +90,31 @@ blogsRouter.put('/:id', async (req, res, next) => {
   }
 })
 
+// POST comment to a blog
+blogsRouter.post("/:id/comments", async (req, res, next) => {
+  try {
+    const { comment } = req.body
+    const blog = await Blog.findById(req.params.id)
+
+    if (!blog) {
+      return res.status(404).json({ error: "blog not found" })
+    }
+
+    if (!comment) {
+      return res.status(400).json({ error: "comment is required" })
+    }
+
+    blog.comments = blog.comments || []
+    blog.comments.push(comment)
+    const updatedBlog = await blog.save()
+    
+    const populatedBlog = await Blog.findById(updatedBlog._id)
+      .populate('user', { username: 1, name: 1 })
+
+    res.json(populatedBlog)
+  } catch (error) {
+    next(error)
+  }
+})
+
 export default blogsRouter
