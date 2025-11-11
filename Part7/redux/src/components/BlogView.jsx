@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-const BlogView = ({ onLike, onDelete }) => {
+const BlogView = ({ onLike, onDelete, onAddComment }) => {
+  const [comment, setComment] = useState('')
   const { id } = useParams()
   const navigate = useNavigate()
   const blogs = useSelector(state => state.blogs)
@@ -65,6 +66,21 @@ const BlogView = ({ onLike, onDelete }) => {
       )}
       <div style={{ marginTop: 20 }}>
         <h3>comments</h3>
+        <form onSubmit={(e) => {
+          e.preventDefault()
+          if (comment.trim()) {
+            onAddComment(blog.id || blog._id, comment.trim())
+            setComment('')
+          }
+        }}>
+          <input
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Add a comment..."
+          />
+          <button type="submit">add comment</button>
+        </form>
         {blog.comments && blog.comments.length > 0 ? (
           <ul>
             {blog.comments.map((comment, index) => (

@@ -11,7 +11,7 @@ import User from './components/User'
 import Notification from './Notifications'
 import { useNotification } from './contexts/NotificationContext'
 import { useUser } from './contexts/UserContext'
-import { useBlogs, useCreateBlog, useLikeBlog, useDeleteBlog } from './hooks/useBlogs'
+import { useBlogs, useCreateBlog, useLikeBlog, useDeleteBlog, useAddComment } from './hooks/useBlogs'
 
 function App() {
   const { notification, showNotification } = useNotification()
@@ -22,6 +22,7 @@ function App() {
   const createBlogMutation = useCreateBlog()
   const likeBlogMutation = useLikeBlog()
   const deleteBlogMutation = useDeleteBlog()
+  const addCommentMutation = useAddComment()
 
   // Fetch blogs whenever user state changes
   useEffect(() => {
@@ -93,6 +94,15 @@ function App() {
     }
   }
 
+  const handleAddComment = async (blogId, comment) => {
+    try {
+      await addCommentMutation.mutateAsync({ id: blogId, comment })
+    } catch (error) {
+      console.error('Failed to add comment:', error)
+      showNotification('Failed to add comment', 'error')
+    }
+  }
+
   if (!user) {
     return (
       <div>
@@ -108,7 +118,7 @@ function App() {
       <Notification message={notification.message} type={notification.type} />
       <Navigation user={user} onLogout={handleLogout} />
       <Routes>
-        <Route path="/blogs/:id" element={<BlogView onLike={handleLike} onDelete={handleDelete} />} />
+        <Route path="/blogs/:id" element={<BlogView onLike={handleLike} onDelete={handleDelete} onAddComment={handleAddComment} />} />
         <Route path="/users/:id" element={<User />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={

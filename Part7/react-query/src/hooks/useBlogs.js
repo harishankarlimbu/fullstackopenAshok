@@ -62,3 +62,28 @@ export const useDeleteBlog = () => {
   })
 }
 
+export const useAddComment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, comment }) => blogService.addComment(id, comment),
+    onSuccess: (updatedBlog) => {
+      queryClient.setQueryData(BLOGS_QUERY_KEY, (oldBlogs) => {
+        if (!oldBlogs) return []
+        return oldBlogs.map((blog) => {
+          const blogId = blog.id || blog._id
+          const updatedId = updatedBlog.id || updatedBlog._id
+          if (blogId === updatedId) {
+            // Preserve user object if it was a string
+            return {
+              ...updatedBlog,
+              user: typeof updatedBlog.user === 'string' ? blog.user : updatedBlog.user,
+            }
+          }
+          return blog
+        })
+      })
+    },
+  })
+}
+

@@ -85,5 +85,25 @@ export const deleteBlog = (id) => {
   }
 }
 
+// Thunk: add a comment to a blog
+export const addComment = (blogId, comment) => {
+  return async (dispatch, getState) => {
+    const returned = await blogService.addComment(blogId, comment)
+    
+    const blogs = getState().blogs
+    const blog = blogs.find(b => (b.id || b._id) === blogId)
+    
+    const enriched = {
+      ...returned,
+      user: typeof returned.user === 'string' 
+        ? blog?.user
+        : returned.user
+    }
+    
+    dispatch(updateBlog(enriched))
+    return enriched
+  }
+}
+
 export default blogSlice.reducer
 

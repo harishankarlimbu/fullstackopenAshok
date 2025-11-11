@@ -10,7 +10,7 @@ import Users from './components/Users'
 import User from './components/User'
 import Notification from './Notifications'
 import { showNotification } from './reducers/notificationReducer'
-import { initializeBlogs, createBlog, setBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
+import { initializeBlogs, createBlog, setBlogs, likeBlog, deleteBlog, addComment } from './reducers/blogReducer'
 import { initializeUser, loginUser, logoutUser } from './reducers/userReducer'
 
 function App() {
@@ -76,6 +76,15 @@ function App() {
     }
   }
 
+  const handleAddComment = async (blogId, comment) => {
+    try {
+      await dispatch(addComment(blogId, comment))
+    } catch (error) {
+      console.error('Failed to add comment:', error)
+      dispatch(showNotification('Failed to add comment', 'error'))
+    }
+  }
+
   if (!user) {
     return (
       <div>
@@ -91,7 +100,7 @@ function App() {
       <Notification message={notification.message} type={notification.type} />
       <Navigation user={user} onLogout={handleLogout} />
       <Routes>
-        <Route path="/blogs/:id" element={<BlogView onLike={handleLike} onDelete={handleDelete} />} />
+        <Route path="/blogs/:id" element={<BlogView onLike={handleLike} onDelete={handleDelete} onAddComment={handleAddComment} />} />
         <Route path="/users/:id" element={<User />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={
