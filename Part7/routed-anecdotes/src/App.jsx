@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import Menu from './Menu'
-import Footer from './Footer'
-import AppRoutes from './routes/AppRoutes'
+import { useState } from 'react';
+import Menu from './Menu';
+import Footer from './Footer';
+import AppRoutes from './routes/AppRoutes';
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
     {
@@ -9,44 +9,42 @@ const App = () => {
       author: 'Jez Humble',
       info: 'https://martinfowler.com/bliki/FrequencyReducesDifficulty.html',
       votes: 0,
-      id: 1
+      id: 1,
     },
     {
       content: 'Premature optimization is the root of all evil',
       author: 'Donald Knuth',
       info: 'http://wiki.c2.com/?PrematureOptimization',
       votes: 0,
-      id: 2
-    }
-  ])
+      id: 2,
+    },
+  ]);
   const addNew = (anecdote) => {
-    anecdote.id = Math.round(Math.random() * 10000)
-    setAnecdotes(anecdotes.concat(anecdote))
-   
-  }
+    anecdote.id = Math.round(Math.random() * 10000);
+    setAnecdotes(anecdotes.concat(anecdote));
+  };
 
-  const anecdoteById = (id) =>
-    anecdotes.find(a => a.id === id)
+  const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
 
   const vote = (id) => {
-    const anecdote = anecdoteById(id)
+    const anecdote = anecdoteById(id);
 
     const voted = {
       ...anecdote,
-      votes: anecdote.votes + 1
-    }
+      votes: anecdote.votes + 1,
+    };
 
-    setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
-  }
+    setAnecdotes(anecdotes.map((a) => (a.id === id ? voted : a)));
+  };
 
- return (
-      <div>
-        <h1>Software anecdotes</h1>
-        <Menu />
-        <AppRoutes anecdotes={anecdotes} addNew={addNew} />
-        <Footer />
-      </div>
-  )
-}
+  return (
+    <div>
+      <h1>Software anecdotes</h1>
+      <Menu />
+      <AppRoutes anecdotes={anecdotes} addNew={addNew} />
+      <Footer />
+    </div>
+  );
+};
 
-export default App
+export default App;

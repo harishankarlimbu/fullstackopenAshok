@@ -1,55 +1,54 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export const useField = (type) => {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState('');
 
   const onChange = (event) => {
-    setValue(event.target.value)
-  }
+    setValue(event.target.value);
+  };
 
   const reset = () => {
-    setValue('')
-  }
+    setValue('');
+  };
 
   return {
     type,
     value,
     onChange,
-    reset
-  }
-}
+    reset,
+  };
+};
 
 export const useResource = (baseUrl) => {
-  const [resources, setResources] = useState([])
+  const [resources, setResources] = useState([]);
 
   useEffect(() => {
     const getAll = async () => {
       try {
-        const response = await axios.get(baseUrl)
-        setResources(response.data)
+        const response = await axios.get(baseUrl);
+        setResources(response.data);
       } catch (error) {
-        console.error('Error fetching resources:', error)
+        console.error('Error fetching resources:', error);
       }
-    }
-    getAll()
-  }, [baseUrl])
+    };
+    getAll();
+  }, [baseUrl]);
 
   const create = async (newObject) => {
     try {
-      const response = await axios.post(baseUrl, newObject)
-      setResources(prevResources => prevResources.concat(response.data))
-      return response.data
+      const response = await axios.post(baseUrl, newObject);
+      setResources((prevResources) => prevResources.concat(response.data));
+      return response.data;
     } catch (error) {
-      console.error('Error creating resource:', error)
-      throw error
+      console.error('Error creating resource:', error);
+      throw error;
     }
-  }
+  };
 
   const service = {
-    create
-  }
+    create,
+  };
 
-  return [resources, service]
-}
-
+  return [resources, service];
+};

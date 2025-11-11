@@ -1,0 +1,12 @@
+{
+  "name": "part7",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
+  }
+}
