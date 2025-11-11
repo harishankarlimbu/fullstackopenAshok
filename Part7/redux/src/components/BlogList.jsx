@@ -1,9 +1,8 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import Blog from './Blog'
 
-const BlogList = ({ onDelete, onLike, currentUser }) => {
+const BlogList = () => {
   const blogs = useSelector(state => state.blogs)
 
   return (
@@ -14,14 +13,8 @@ const BlogList = ({ onDelete, onLike, currentUser }) => {
         .map((blog) => (
           <div key={blog.id || blog._id}>
             <Link to={`/blogs/${blog.id || blog._id}`}>
-              {blog.title}
+              {blog.title} by {blog.author}
             </Link>
-            <Blog
-              blog={blog}
-              onDelete={onDelete}
-              onLike={onLike}
-              currentUser={currentUser}
-            />
           </div>
         ))}
     </div>

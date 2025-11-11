@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
+import BlogView from './components/BlogView'
 import Users from './components/Users'
 import User from './components/User'
 import Notification from './Notifications'
@@ -113,18 +114,14 @@ function App() {
         </span>
       </div>
       <Routes>
+        <Route path="/blogs/:id" element={<BlogView onLike={handleLike} onDelete={handleDelete} />} />
         <Route path="/users/:id" element={<User />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={
           <div>
             <h2>blogs</h2>
             <BlogForm onCreate={handleCreate} />
-            <BlogList
-              blogs={blogs}
-              onDelete={handleDelete}
-              onLike={handleLike}
-              currentUser={user}
-            />
+            <BlogList blogs={blogs} />
           </div>
         } />
       </Routes>
