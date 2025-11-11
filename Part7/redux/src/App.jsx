@@ -1,29 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
-import blogService from './services/blogs'
-import loginService from './services/login'
 import Notification from './Notifications'
 import { showNotification } from './reducers/notificationReducer'
 import { initializeBlogs, createBlog, setBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
+import { initializeUser, loginUser, logoutUser } from './reducers/userReducer'
 
 function App() {
   const blogs = useSelector(state => state.blogs)
-  const [user, setUser] = useState(null)
+  const user = useSelector(state => state.user)
   const notification = useSelector(state => state.notification)
   const dispatch = useDispatch()
 
-  // Load logged-in user from localStorage
+  // Initialize user from localStorage on app start
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
-  }, [])
+    dispatch(initializeUser())
+  }, [dispatch])
 
   // Fetch blogs whenever user state changes
   useEffect(() => {
@@ -34,10 +28,7 @@ function App() {
 
   const handleLogin = async (credentials) => {
     try {
-      const loggedUser = await loginService.login(credentials)
-      setUser(loggedUser)
-      blogService.setToken(loggedUser.token)
-      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(loggedUser))
+      const loggedUser = await dispatch(loginUser(credentials))
       dispatch(showNotification(`${loggedUser.username} logged in successfully`, 'success'))
       dispatch(initializeBlogs())
     } catch (error) {
@@ -47,10 +38,8 @@ function App() {
   }
 
   const handleLogout = () => {
-    setUser(null)
-    blogService.setToken(null)
+    dispatch(logoutUser())
     dispatch(setBlogs([]))
-    window.localStorage.removeItem('loggedBlogAppUser')
     dispatch(showNotification('Logged out successfully', 'success'))
   }
 
