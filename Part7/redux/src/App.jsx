@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import BlogView from './components/BlogView'
+import Navigation from './components/Navigation'
 import Users from './components/Users'
 import User from './components/User'
 import Notification from './Notifications'
@@ -88,14 +89,7 @@ function App() {
   return (
     <div>
       <Notification message={notification.message} type={notification.type} />
-      <div>
-        <Link to="/" style={{ padding: 5 }}>blogs</Link>
-        <Link to="/users" style={{ padding: 5 }}>users</Link>
-        <span style={{ padding: 5 }}>
-          {user.name} logged in
-          <button onClick={handleLogout}>logout</button>
-        </span>
-      </div>
+      <Navigation user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/blogs/:id" element={<BlogView onLike={handleLike} onDelete={handleDelete} />} />
         <Route path="/users/:id" element={<User />} />
