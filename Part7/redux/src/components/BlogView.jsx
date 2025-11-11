@@ -63,6 +63,20 @@ const BlogView = ({ onLike, onDelete }) => {
           remove
         </button>
       )}
+      <div style={{ marginTop: 20 }}>
+        <h3>comments</h3>
+        {blog.comments && blog.comments.length > 0 ? (
+          <ul>
+            {blog.comments.map((comment, index) => (
+              <li key={index}>
+                {typeof comment === 'string' ? comment : comment.content || comment.text || comment}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No comments yet.</p>
+        )}
+      </div>
     </div>
   )
 }
