@@ -57,5 +57,33 @@ export const createBlog = (newBlog, user) => {
   }
 }
 
+// Thunk: like a blog
+export const likeBlog = (blogId) => {
+  return async (dispatch, getState) => {
+    const blogs = getState().blogs
+    const blog = blogs.find(b => b.id === blogId || b._id === blogId)
+    if (!blog) return
+
+    const updatedData = { likes: (blog.likes || 0) + 1 }
+    const returned = await blogService.update(blogId, updatedData)
+
+    const enriched = {
+      ...returned,
+      user: typeof returned.user === 'string' ? blog.user : returned.user
+    }
+
+    dispatch(updateBlog(enriched))
+    return enriched
+  }
+}
+
+// Thunk: delete a blog
+export const deleteBlog = (id) => {
+  return async dispatch => {
+    await blogService.remove(id)
+    dispatch(removeBlog(id))
+  }
+}
+
 export default blogSlice.reducer
 

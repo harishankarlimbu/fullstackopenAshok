@@ -7,7 +7,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './Notifications'
 import { showNotification } from './reducers/notificationReducer'
-import { initializeBlogs, createBlog, setBlogs, updateBlog, removeBlog } from './reducers/blogReducer'
+import { initializeBlogs, createBlog, setBlogs, likeBlog, deleteBlog } from './reducers/blogReducer'
 
 function App() {
   const blogs = useSelector(state => state.blogs)
@@ -65,19 +65,8 @@ function App() {
   }
 
   const handleLike = async (blogId) => {
-    const blog = blogs.find(b => b.id === blogId || b._id === blogId)
-    if (!blog) return
-
     try {
-      const updatedData = { likes: (blog.likes || 0) + 1 }
-      const returned = await blogService.update(blogId, updatedData)
-
-      const enriched = {
-        ...returned,
-        user: typeof returned.user === 'string' ? blog.user : returned.user
-      }
-
-      dispatch(updateBlog(enriched))
+      await dispatch(likeBlog(blogId))
     } catch (error) {
       console.error('Failed to like blog:', error)
     }
@@ -85,8 +74,7 @@ function App() {
 
   const handleDelete = async (id) => {
     try {
-      await blogService.remove(id)
-      dispatch(removeBlog(id))
+      await dispatch(deleteBlog(id))
       dispatch(showNotification('Blog deleted successfully', 'success'))
     } catch (error) {
       console.log(error)
